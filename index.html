@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สื่อการสอน : เครื่องมือกลและซ่อมบำรุง</title>
+
+  <style>
+    
+    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(135deg, #e0f0ff, #ffffff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .book-container {
+      width: 90%;
+      max-width: 720px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: 0.5s;
+    }
+
+    h1 {
+      color: #0077cc;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    h2 {
+      color: #444;
+      font-size: 20px;
+    }
+
+    .content {
+      margin: 25px 0;
+      min-height: 220px;
+      line-height: 1.8;
+      font-size: 18px;
+      color: #333;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: 0.4s;
+    }
+
+    .content.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #0077cc;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .progress {
+      margin-top: 15px;
+      font-size: 14px;
+      color: gray;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #ddd;
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #0077cc;
+      transition: width 0.5s;
+    }
+
+    .quiz-btn {
+      background: #ffb100;
+      margin-top: 15px;
+    }
+
+    .quiz-btn:hover {
+      background: #e69a00;
+    }
+
+    .quiz {
+      display: none;
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .quiz input {
+      margin-right: 8px;
+    }
+
+    .quiz-result {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="book-container">
+    <h1>สื่อการสอน</h1>
+    <h2>เทคนิคการควบคุมคุณภาพ</h2>
+
+    <div id="page-content" class="content"></div>
+
+    <button id="quizBtn" class="quiz-btn">🧠 แบบทดสอบท้ายบท</button>
+
+    <div class="quiz" id="quiz">
+      <p><b>คำถาม:</b> เครื่องมือใดใช้วัดความละเอียดสูงสุด?</p>
+      <label><input type="radio" name="q1" value="a"> เวอร์เนีย</label><br>
+      <label><input type="radio" name="q1" value="b"> ไมโครมิเตอร์</label><br>
+      <label><input type="radio" name="q1" value="c"> เกจวัดระยะ</label><br>
+      <div class="quiz-result" id="quizResult"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button id="prevBtn">⬅ ก่อนหน้า</button>
+      <button id="nextBtn">ถัดไป ➡</button>
+    </div>
+
+    <div class="progress" id="progress"></div>
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <script>
+    const pages = [
+      "📘 ยินดีต้อนรับสู่สื่อการสอนเรื่อง <b>เทคนิคการควบคุมคุณภาพ</b><br><br>บทเรียนนี้จะช่วยให้คุณเข้าใจแนวคิดพื้นฐานเกี่ยวกับการควบคุมคุณภาพในงานเครื่องมือกลและซ่อมบำรุง",
+      "🔧 <b>ความหมายของการควบคุมคุณภาพ</b><br>กระบวนการตรวจสอบ ดูแล และปรับปรุงให้การผลิตหรือการให้บริการเป็นไปตามมาตรฐานที่กำหนดไว้ เพื่อให้สินค้าหรือบริการมีคุณภาพตรงตามความต้องการของลูกค้าและลดความผิดพลาดที่เกิดขึ้นระหว่างการผลิต",
+      "🧰 <b>เครื่องมือที่ใช้ในการควบคุมคุณภาพ</b><br>- เวอร์เนีย<br>- ไมโครมิเตอร์<br>- เกจวัดระยะ<br>- เครื่องวัดความเรียบ<br>เครื่องมือเหล่านี้ช่วยให้วัดค่าความคลาดเคลื่อนได้แม่นยำ",
+      "📊 <b>การเก็บข้อมูลคุณภาพ</b><br>การบันทึกค่าการตรวจสอบในแต่ละรอบ เพื่อใช้ในการวิเคราะห์และปรับปรุงกระบวนการผลิตให้ดีขึ้น",
+      "✅ <b>สรุป</b><br>การควบคุมคุณภาพเป็นหัวใจสำคัญในการซ่อมบำรุงและผลิตสินค้ามาตรฐานสูง ช่วยลดของเสียและเพิ่มความพึงพอใจของลูกค้า"
+    ];
+
+    let currentPage = 0;
+    const content = document.getElementById("page-content");
+    const progress = document.getElementById("progress");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const fill = document.getElementById("progressFill");
+    const quizBtn = document.getElementById("quizBtn");
+    const quiz = document.getElementById("quiz");
+    const quizResult = document.getElementById("quizResult");
+
+    function showPage(index) {
+      content.classList.remove("show");
+      setTimeout(() => {
+        content.innerHTML = pages[index];
+        content.classList.add("show");
+        progress.textContent = `หน้า ${index + 1} จาก ${pages.length}`;
+        fill.style.width = ((index + 1) / pages.length) * 100 + "%";
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === pages.length - 1;
+      }, 200);
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 0) {
+        currentPage--;
+        showPage(currentPage);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < pages.length - 1) {
+        currentPage++;
+        showPage(currentPage);
+      }
+    });
+
+    quizBtn.addEventListener("click", () => {
+      quiz.style.display = quiz.style.display === "block" ? "none" : "block";
+    });
+
+    quiz.addEventListener("change", (e) => {
+      if (e.target.value === "b") {
+        quizResult.textContent = "✅ ถูกต้อง! ไมโครมิเตอร์มีความละเอียดสูงสุด";
+        quizResult.style.color = "green";
+      } else {
+        quizResult.textContent = "❌ ยังไม่ถูก ลองใหม่อีกครั้ง!";
+        quizResult.style.color = "red";
+      }
+    });
+
+    showPage(currentPage);
+  </script>
+</body>
+</html>
